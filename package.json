@@ -82,6 +82,7 @@
     "level-party": "^3.0.4",
     "level-sublevel": "^6.6.1",
     "leveldown": "^1.6.0",
+    "limit-concurrency-decorator": "^0.1.0",
     "lodash": "^4.17.4",
     "make-error": "^1",
     "micromatch": "^3.0.4",

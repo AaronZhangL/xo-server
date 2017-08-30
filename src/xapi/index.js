@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+import concurrency from 'limit-concurrency-decorator'
 import deferrable from 'golike-defer'
 import fatfs from 'fatfs'
 import synchronized from 'decorator-synchronized'
@@ -80,6 +81,8 @@ export const VDI_FORMAT_RAW = 'raw'
 
 export const IPV4_CONFIG_MODES = ['None', 'DHCP', 'Static']
 export const IPV6_CONFIG_MODES = ['None', 'DHCP', 'Static', 'Autoconf']
+
+const transferLimit = concurrency(2)
 
 // ===================================================================
 
@@ -722,6 +725,7 @@ export default class Xapi extends XapiBase {
   }
 
   // Returns a stream to the exported VM.
+  @transferLimit
   async exportVm (vmId, {
     compress = true,
     onlyMetadata = false
@@ -1202,6 +1206,7 @@ export default class Xapi extends XapiBase {
     })))
   }
 
+  @transferLimit
   async _importVm (stream, sr, onlyMetadata = false, onVmCreation = undefined) {
     const taskRef = await this.createTask('VM import')
     const query = {
@@ -1241,6 +1246,8 @@ export default class Xapi extends XapiBase {
     return vmRef
   }
 
+
+  @transferLimit
   @deferrable.onFailure
   async _importOvaVm ($onFailure, stream, {
     descriptionLabel,
@@ -1843,6 +1850,7 @@ export default class Xapi extends XapiBase {
   }
 
   @cancellable
+  @transferLimit
   _exportVdi ($cancelToken, vdi, base, format = VDI_FORMAT_VHD) {
     const host = vdi.$SR.$PBDs[0].$host
 
